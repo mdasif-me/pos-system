@@ -19,6 +19,17 @@
 
 # production
 /build
+/dist
+
+# electron build outputs
+/dist-electron
+/release
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.snap
 
 # misc
 .DS_Store
