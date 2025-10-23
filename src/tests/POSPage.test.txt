@@ -1,0 +1,95 @@
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { POSPage } from '../pages/POSPage';
+
+// Mock the store
+jest.mock('../stores/posStore', () => ({
+  usePosStore: () => ({
+    products: [
+      {
+        id: '1',
+        name: 'Test Coffee',
+        price: 3.50,
+        category: 'beverages',
+        stock: 100,
+        barcode: '123456789',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ],
+    categories: [
+      { id: 'beverages', name: 'Beverages', color: '#3B82F6' },
+    ],
+    cart: [],
+    addToCart: jest.fn(),
+    removeFromCart: jest.fn(),
+    updateCartQuantity: jest.fn(),
+    clearCart: jest.fn(),
+    getCartTotal: () => 0,
+    createTransaction: jest.fn(),
+    completeTransaction: jest.fn(),
+  }),
+}));
+
+// Mock react-hot-toast
+jest.mock('react-hot-toast', () => ({
+  __esModule: true,
+  default: {
+    success: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+describe('POSPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('renders POS page with products', () => {
+    render(<POSPage />);
+    
+    expect(screen.getByText('Products')).toBeInTheDocument();
+    expect(screen.getByText('Cart')).toBeInTheDocument();
+    expect(screen.getByText('Test Coffee')).toBeInTheDocument();
+    expect(screen.getByText('$3.50')).toBeInTheDocument();
+  });
+
+  test('displays search input', () => {
+    render(<POSPage />);
+    
+    const searchInput = screen.getByPlaceholderText('Search products or scan barcode...');
+    expect(searchInput).toBeInTheDocument();
+  });
+
+  test('shows category filters', () => {
+    render(<POSPage />);
+    
+    expect(screen.getByText('All Products')).toBeInTheDocument();
+    expect(screen.getByText('Beverages')).toBeInTheDocument();
+  });
+
+  test('displays empty cart message when cart is empty', () => {
+    render(<POSPage />);
+    
+    expect(screen.getByText('Your cart is empty')).toBeInTheDocument();
+  });
+
+  test('can search for products', () => {
+    render(<POSPage />);
+    
+    const searchInput = screen.getByPlaceholderText('Search products or scan barcode...');
+    fireEvent.change(searchInput, { target: { value: 'Coffee' } });
+    
+    expect(screen.getByText('Test Coffee')).toBeInTheDocument();
+  });
+
+  test('can filter by category', () => {
+    render(<POSPage />);
+    
+    const beveragesButton = screen.getByText('Beverages');
+    fireEvent.click(beveragesButton);
+    
+    expect(screen.getByText('Test Coffee')).toBeInTheDocument();
+  });
+});

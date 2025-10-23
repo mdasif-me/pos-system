@@ -1,0 +1,20 @@
+directories:
+  output: dist
+  buildResources: assets
+files:
+  - filter:
+      - build/**/*
+      - build/**/*
+      - public/electron.js
+extraMetadata:
+  main: build/electron.js
+appId: com.pos.system
+productName: POS System
+mac:
+  category: public.app-category.finance
+win:
+  target: nsis
+linux:
+  target: AppImage
+extends: react-cra
+electronVersion: 25.9.8
